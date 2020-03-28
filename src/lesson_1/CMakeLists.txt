@@ -1,0 +1,35 @@
+MESSAGE("------------------------Lesson_1")
+
+INCLUDE_DIRECTORIES(
+	${THIRDPARTY_GLAD_DIR}/include
+	${THIRDPARTY_GLFW_DIR}/include
+)
+
+LINK_DIRECTORIES(
+	${THIRDPARTY_GLFW_DIR}/lib/Debug
+	${THIRDPARTY_GLFW_DIR}/lib/Release
+)
+
+FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
+    *.cpp
+    *.h
+    )
+
+ADD_EXECUTABLE(Lesson_1 ${PROJECT_SOURCE_FILES})
+SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
+TARGET_LINK_LIBRARIES(Lesson_1 debug glfw3d)
+TARGET_LINK_LIBRARIES(Lesson_1 optimized glfw3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
