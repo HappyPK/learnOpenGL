@@ -12,16 +12,14 @@ LINK_DIRECTORIES(
 
 FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
+	${THIRDPARTY_GLAD_DIR}/src/*.c
     *.h
     )
 
 ADD_EXECUTABLE(Lesson_1 ${PROJECT_SOURCE_FILES})
 SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
-TARGET_LINK_LIBRARIES(Lesson_1 debug glfw3d)
-TARGET_LINK_LIBRARIES(Lesson_1 optimized glfw3)
-
-
-
+TARGET_LINK_LIBRARIES(Lesson_1 debug glfw3d optimized glfw3)
+TARGET_LINK_LIBRARIES(Lesson_1 debug opengl32 optimized opengl32)
 
 
 
