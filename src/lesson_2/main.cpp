@@ -1,216 +1,177 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "common.h"
 
-#include <iostream>
-#include<vector>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
-
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
-const char* vertexShaderSource = "#version 330 core\n"
+const char* vertexShaderSource = "#version 460 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
+
+const char* fragmentShaderSource = "#version 460 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = vec4(1.0f, 0.5f, 0.2f, 0.0f);\n"
 "}\n\0";
 
-bool createShader(GLuint &vertexShader, GLsizei count, const GLchar* const* string, GLchar* infoLog)
+using namespace LearnOpenGL;
+
+
+bool CheckShader(const int &shader)
 {
-    glShaderSource(vertexShader, count, string, NULL);
-    glCompileShader(vertexShader);
     // check for shader compile errors
     int success;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
         return false;
-     }
+    }
     return true;
 }
 
-bool linkShader(GLuint &shaderProgram, GLuint& vertexShader, GLuint& fragmentShader, GLchar* infoLog)
+bool CreateShader(int& shader, const GLenum &type, const GLchar* const* string)
 {
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    int success = 0;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+    shader = glCreateShader(type);
+    glShaderSource(shader, 1, string, NULL);
+    glCompileShader(shader);
+    if (!CheckShader(shader))
         return false;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
     return true;
 }
 
-struct MonitorResolution
-{ 
-    int m_screenX;
-    int m_screenY;
-    MonitorResolution::MonitorResolution(int x, int y) 
-        :m_screenX(x), m_screenY(y)
-    {
-
-    }
-};
-
-std::vector<MonitorResolution> getMonitorResolution()
+bool LinkShader(int &Linkshader, const int& shader1, const int& shader2)
 {
-    std::vector<MonitorResolution> mrList;
-    GLint monitorCount;
-    GLFWmonitor** pMonitor = glfwGetMonitors(&monitorCount);
+    Linkshader = glCreateProgram();
+    glAttachShader(Linkshader, shader1);
+    glAttachShader(Linkshader, shader2);
+    glLinkProgram(Linkshader);
 
-    std::cout << "Now, Screen number is " << monitorCount << std::endl;
-    for (int i = 0; i < monitorCount; i++) 
+    if (!CheckShader(Linkshader))
+        return false;
+    return true;
+
+    glDeleteShader(shader1);
+    glDeleteShader(shader2);
+}
+
+void SetVertex(std::vector<float> &vertices)
+{
+    vertices =
     {
-        const GLFWvidmode* mode = glfwGetVideoMode(pMonitor[i]);
-        std::cout << "Screen size is X = " << mode->width << ", Y = " << mode->height << std::endl;
-        mrList.emplace_back(mode->width, mode->height);
-    }
+        0.5f, 0.5f, 0.0f,   // 右上角
+        0.5f, -0.5f, 0.0f,  // 右下角
+        -0.5f, -0.5f, 0.0f, // 左下角
+        -0.5f, 0.5f, 0.0f   // 左上角 
+    };
+}
 
-    return mrList;
+void SetIndex(std::vector<unsigned int>& indices)
+{
+    indices =
+    { // 注意索引从0开始! 
+        0, 1, 3, // 第一个三角形
+        1, 2, 3  // 第二个三角形
+    };
+}
+
+unsigned int createVBO(const std::vector<float> vertices)
+{
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, (vertices.size() * sizeof(float)), vertices.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    return VBO;
+}
+
+unsigned int createVAO()
+{
+    unsigned int  VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    return VAO;
+}
+
+unsigned int createEBO(std::vector<unsigned int> indices)
+{
+    unsigned int  EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()* sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    return EBO;
+}
+
+void SetGLMode(const GLenum &mode)
+{
+    glPolygonMode(GL_FRONT_AND_BACK, mode);
 }
 
 int main()
 {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    std::unique_ptr<LearnOpenGLCommon> learnopengl = std::make_unique<LearnOpenGLCommon>(4, 6, 1280, 768, "Lesson 2");
 
-    std::vector<MonitorResolution> monitorResolutionList = getMonitorResolution();
+    auto window = learnopengl->GetGlfwWindows();
 
-    GLFWwindow* window = glfwCreateWindow(monitorResolutionList[0].m_screenX, monitorResolutionList[0].m_screenY, "LearnOpenGL", glfwGetPrimaryMonitor(), NULL);
-    if (window == NULL)
+    //创建一个着色器对象
+    int vertexShader = 0;
+    if (!CreateShader(vertexShader, GL_VERTEX_SHADER, &vertexShaderSource))
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return false;
     }
 
-    // build and compile our shader program
-    // ------------------------------------
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);// vertex shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);// fragment shader
-    GLuint shaderProgram = glCreateProgram();// link shaders
-    char infoLog[512];
-    if (!createShader(vertexShader, 1, &vertexShaderSource, infoLog))
+    //片段着色器
+    int fragmentShader = 0;
+    if (!CreateShader(vertexShader, GL_FRAGMENT_SHADER, &fragmentShaderSource))
     {
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    if (!createShader(fragmentShader, 1, &fragmentShaderSource, infoLog))
-    {
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    if (!linkShader(shaderProgram, vertexShader, fragmentShader, infoLog))
-    {
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        return false;
     }
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    GLfloat vertices[] = 
+    //连接着色器
+    int shaderProgram = 0;
+    if (!LinkShader(shaderProgram, vertexShader, fragmentShader))
     {
-        -0.5f, -0.5f, -1.0f, // left  
-         0.5f, -0.5f, -1.0f, // right 
-         0.0f,  1.0f, 1.0f  // top   
-    };
+        return false;
+    }
 
-    GLuint VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+    std::vector<float> vertices;
+    SetVertex(vertices);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    std::vector<unsigned int> indices;
+    SetIndex(indices);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    unsigned int VBO, VAO, EBO;
+    
+    VAO = createVAO();
+    VBO = createVBO(vertices);
+    EBO = createEBO(indices);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    SetGLMode(GL_FILL);
 
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
-
-
-    // uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_TRIANGLES);
-
-    // render loop
-    // -----------
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        // -----
-        processInput(window);
+        learnopengl->processInput();
 
-        // render
-        // ------
-        glClearColor(0.534f, 0.3465f, 0.367f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        // draw our first triangle
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        //glBindVertexArray(0); // no need to unbind it every time 
+        glBindVertexArray(VAO); 
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteProgram(shaderProgram);
 
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
-    glfwTerminate();
     return 0;
 }
 
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
-    {
-        glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
-    }
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}

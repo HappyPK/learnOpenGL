@@ -5,6 +5,7 @@ set (Lesson_1 "Lesson_1")
 INCLUDE_DIRECTORIES(
 	${THIRDPARTY_GLAD_DIR}/include
 	${THIRDPARTY_GLFW_DIR}/include
+	../Common
 )
 
 LINK_DIRECTORIES(
@@ -16,6 +17,8 @@ FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
 	${THIRDPARTY_GLAD_DIR}/src/*.c
     *.h
+	../Common/*.h
+	../Common/*.cpp
     )
 
 ADD_EXECUTABLE(Lesson_1 ${PROJECT_SOURCE_FILES})
