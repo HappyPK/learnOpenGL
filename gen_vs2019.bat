@@ -6,6 +6,11 @@ cd build
 if not exist vc16 mkdir vc16
 cd vc16
 
+conan install ..\..\  -g cmake_multi  -s compiler="Visual Studio" -s compiler.version=16 -s arch=x86_64 -s build_type=Debug --update
+if %errorlevel% neq 0 exit
+conan install ..\..\  -g cmake_multi  -s compiler="Visual Studio" -s compiler.version=16 -s arch=x86_64 -s build_type=Release --update
+if %errorlevel% neq 0 exit
+
 cmake ../../ -G "Visual Studio 16 2019"
 
 cd ../../

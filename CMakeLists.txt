@@ -2,6 +2,26 @@ cmake_minimum_required(VERSION 3.12.0)
 
 project(Learn.opengl)
 
+##use conan
+set(USE_CONAN ON)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+MACRO( OPTION_WITH_DEFAULT OPTION_NAME OPTION_STRING OPTION_DEFAULT )
+	IF( NOT DEFINED ${OPTION_NAME} )
+		SET( ${OPTION_NAME} ${OPTION_DEFAULT} )
+	ENDIF( NOT DEFINED ${OPTION_NAME} )
+	OPTION( ${OPTION_NAME} "${OPTION_STRING}" ${${OPTION_NAME}} )
+ENDMACRO( OPTION_WITH_DEFAULT OPTION_NAME OPTION_STRING OPTION_DEFAULT )
+
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+else()
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+endif()
+conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+set(USE_CONAN ON)
+
+
 ############################
 # Check 32/64 bit platform #
 if (${CMAKE_SIZEOF_VOID_P} MATCHES "8") # It is 64bit, otherwise 32 bit systems match 4
@@ -11,6 +31,13 @@ else (${CMAKE_SIZEOF_VOID_P} MATCHES "4")
 endif(${CMAKE_SIZEOF_VOID_P} MATCHES "8")
 
 message(STATUS "Build ${PlatformName}")
+
+if(UNIX)
+    SET(CMAKE_C_FLAGS "-std=c17 -fPIC")
+    SET(CMAKE_CXX_FLAGS "-std=c++17 -fPIC -lstdc++fs")
+else(UNIX)
+    SET(CMAKE_CXX_STANDARD 17)
+endif(UNIX)
 
 set (BIN_DIR "${CMAKE_SOURCE_DIR}/bin/${PlatformName}" CACHE PATH "BIN DIR")
 set (THIRDPARTY_GLAD_DIR "${CMAKE_SOURCE_DIR}/3rdParty/glad")
@@ -46,6 +73,7 @@ ENDMACRO(SOURCE_GROUP_BY_DIR)
 add_subdirectory(src/Lesson_1)
 add_subdirectory(src/Lesson_2)
 add_subdirectory(src/Lesson_3)
+add_subdirectory(src/Lesson_4)
 add_subdirectory(src/shader)
 
 
