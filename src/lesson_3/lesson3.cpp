@@ -1,8 +1,5 @@
 #include "common.h"
 #include "Shader.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 #define USE_MORE_ATTRIBUTE true
 
 using namespace LearnOpenGL;
@@ -90,8 +87,8 @@ int main()
 
     auto window = learnopengl->GetGlfwWindows();
 
-    std::string VertexPath = "E:\\learnOpenGL\\src\\shader\\vertex.shader";
-    std::string FragmentPath = "E:\\learnOpenGL\\src\\shader\\fragment.shader";
+    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_3\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_3\\shader\\fragment.shader";
     std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(),FragmentPath.c_str());
 
     myShader->use();
