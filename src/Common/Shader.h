@@ -12,8 +12,10 @@ class MyShader
 public:
 	MyShader(const char* VertexPath, const char* FramentPath)
 	{
-		std::string vShaderCode; ReadShaderCode(VertexPath, vShaderCode);
-		std::string fShaderCode; ReadShaderCode(FramentPath, fShaderCode);
+		std::string vShaderCode; 
+		ReadShaderCode(VertexPath, vShaderCode);
+		std::string fShaderCode;
+		ReadShaderCode(FramentPath, fShaderCode);
 
 		const char* vCode = vShaderCode.c_str();
 		const char* fCode = fShaderCode.c_str();
@@ -58,7 +60,7 @@ private:
 		ShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		try
 		{
-			ShaderFile.open(CodePath);
+			ShaderFile.open(CodePath,std::ios::in);
 			std::stringstream ShaderStream;
 			ShaderStream << ShaderFile.rdbuf();
 			ShaderFile.close();

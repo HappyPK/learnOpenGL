@@ -65,7 +65,7 @@ void SetGLMode(const GLenum& mode)
     glPolygonMode(GL_FRONT_AND_BACK, mode);
 }
 
-void createTexture(uint32_t &texture)
+void createTexture(const std::string &image, uint32_t &texture)
 {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
@@ -78,7 +78,7 @@ void createTexture(uint32_t &texture)
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     
-    std::string path = "..\\..\\..\\..\\pic\\wall.jpg";
+    std::string path = "..\\..\\..\\..\\pic\\" + image;
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
@@ -98,8 +98,8 @@ int main()
 
     auto window = learnopengl->GetGlfwWindows();
 
-    std::string VertexPath = "..\\..\\..\\..\\learnOpenGL\\src\\lesson_4\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\learnOpenGL\\src\\lesson_4\\shader\\fragment.shader";
+    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_4\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_4\\shader\\fragment.shader";
     std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(),FragmentPath.c_str());
 
     myShader->use();
@@ -114,8 +114,8 @@ int main()
     createVAO(VAO);
     createVBO(vertices, VBO);
     createEBO(indices, EBO);
-    createTexture(Texture);
-    SetGLMode(GL_FILL);
+    createTexture("container.jpg", Texture);
+    //SetGLMode(GL_FILL);
     float offset = 0.5f;
     myShader->setFloat("xOffset", offset);
 
@@ -126,9 +126,13 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // bind Texture
+        glBindTexture(GL_TEXTURE_2D, Texture);
+
         glBindVertexArray(VAO);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+       // glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
