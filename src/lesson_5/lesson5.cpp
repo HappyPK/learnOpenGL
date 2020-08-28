@@ -3,6 +3,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 #define USE_MORE_ATTRIBUTE true
 
 using namespace LearnOpenGL;
@@ -112,10 +116,16 @@ int main()
     std::unique_ptr<LearnOpenGLCommon> learnopengl = std::make_unique<LearnOpenGLCommon>(4, 6, 1280, 768, "Lesson 4");
 
     auto window = learnopengl->GetGlfwWindows();
+    
+    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_5\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_5\\shader\\fragment.shader";
+    std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(), FragmentPath.c_str());
 
-    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_4\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_4\\shader\\fragment.shader";
-    std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(),FragmentPath.c_str());
+
+    /*glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));*/
+    
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -131,13 +141,12 @@ int main()
     createEBO(indices, EBO);
     createTexture("container.jpg", Texture1);
     createTexture("awesomeface.png", Texture2);
-    //SetGLMode(GL_FILL);
-   // float offset = 0.5f;
-    //myShader->setFloat("xOffset", offset);
 
     myShader->use();
     myShader->setInt("texture1", 0);
     myShader->setInt("texture2", 1);
+   /* unsigned int transformLoc = glGetUniformLocation(myShader->GetProgramID(), "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));*/
 
     while (!glfwWindowShouldClose(window))
     {
@@ -151,6 +160,14 @@ int main()
         glBindTexture(GL_TEXTURE_2D, Texture1);
         glActiveTexture(GL_TEXTURE1); // 在绑定纹理之前先激活纹理单元
         glBindTexture(GL_TEXTURE_2D, Texture2);
+
+        float i = 0.0;
+        glm::mat4 trans = glm::mat4(1.0f);
+       // trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::scale(trans, glm::vec3(1.5, 1.5, 1.5));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(1.0, 1.0, 1.0));
+        unsigned int transformLoc = glGetUniformLocation(myShader->GetProgramID(), "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         myShader->use();
         glBindVertexArray(VAO);
