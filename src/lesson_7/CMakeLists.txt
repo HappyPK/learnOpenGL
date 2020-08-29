@@ -1,11 +1,12 @@
-MESSAGE("------------------------Lesson_3.GLSL")
+MESSAGE("------------------------Lesson_7.Camera")
 
-set (Lesson_3 "Lesson_3")
+set (Lesson_7 "Lesson_7")
 
 INCLUDE_DIRECTORIES(
 	${THIRDPARTY_GLAD_DIR}/include
 	${THIRDPARTY_GLFW_DIR}/include
 	../Common
+	${CONAN_INCLUDE_DIRS_STB_RELEASE}
 	${CONAN_INCLUDE_DIRS_GLM_RELEASE}
 )
 
@@ -22,17 +23,18 @@ FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
 	../Common/*.cpp
 	./shader/*.shader
     )
-
-ADD_EXECUTABLE(Lesson_3 ${PROJECT_SOURCE_FILES})
-SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
-TARGET_LINK_LIBRARIES(Lesson_3 debug glfw3d optimized glfw3)
-TARGET_LINK_LIBRARIES(Lesson_3 debug opengl32 optimized opengl32)
-
+	
 file(GLOB_RECURSE project_headers *.h)
 file(GLOB_RECURSE project_cpps *.cpp)
 file(GLOB_RECURSE project_shaders *.shader)
 set(all_files ${project_headers} ${project_cpps} ${project_shaders})
 SOURCE_GROUP_BY_DIR(all_files)
+
+ADD_EXECUTABLE(Lesson_7 ${PROJECT_SOURCE_FILES})
+SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
+TARGET_LINK_LIBRARIES(Lesson_7 debug glfw3d optimized glfw3)
+TARGET_LINK_LIBRARIES(Lesson_7 debug opengl32 optimized opengl32)
+
 
 
 

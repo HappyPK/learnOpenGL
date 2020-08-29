@@ -4,6 +4,10 @@
 #include <vector>
 #include <string>
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 namespace LearnOpenGL
 {
 	class LearnOpenGLCommon
@@ -16,7 +20,7 @@ namespace LearnOpenGL
 		bool InitGlfwWindows(const int& width, const int& height, const char* name);
 
 		GLFWwindow* GetGlfwWindows() { return m_window; }
-		void processInput();
+		void processInput(glm::vec3 &cameraPos, glm::vec3 &cameraFront, glm::vec3 &cameraUp);
 	private:
 		void GlfwInit();
 		void SetOpenGlVersion(const int& PROFILE, const int& CORE_PROFILE);

@@ -24,12 +24,28 @@ namespace LearnOpenGL
         glfwTerminate();
     }
 
-    void LearnOpenGLCommon::processInput()
+    void LearnOpenGLCommon::processInput(glm::vec3 &cameraPos, glm::vec3 &cameraFront, glm::vec3 &cameraUp)
     {
         if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(m_window, true);
         if (glfwGetKey(m_window, GLFW_KEY_ENTER) == GLFW_PRESS)
             glfwSetWindowShouldClose(m_window, true);
+
+        float deltaTime = 0.0f; // 当前帧与上一帧的时间差
+        float lastFrame = 0.0f; // 上一帧的时间
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        float cameraSpeed = 0.005f * deltaTime; // adjust accordingly
+        if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+            cameraPos += cameraSpeed * cameraFront;
+        if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+            cameraPos -= cameraSpeed * cameraFront;
+        if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     }
 
     void LearnOpenGLCommon::GlfwInit()
