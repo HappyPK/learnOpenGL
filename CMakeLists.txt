@@ -75,7 +75,7 @@ add_subdirectory(src/Lesson_2)
 add_subdirectory(src/Lesson_3)
 add_subdirectory(src/Lesson_4)
 add_subdirectory(src/Lesson_5)
-
+add_subdirectory(src/Lesson_6)
 
 
 
