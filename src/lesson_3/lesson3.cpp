@@ -2,8 +2,6 @@
 #include "Shader.h"
 #define USE_MORE_ATTRIBUTE true
 
-using namespace LearnOpenGL;
-
 void SetVertex(std::vector<float>& vertices)
 {
     if (USE_MORE_ATTRIBUTE)

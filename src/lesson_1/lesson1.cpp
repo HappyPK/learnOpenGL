@@ -1,7 +1,5 @@
 #include "common.h"
 
-using namespace LearnOpenGL;
-
 int main()
 {
     std::unique_ptr<LearnOpenGLCommon> learnopengl = std::make_unique<LearnOpenGLCommon>(4, 6, 1280, 768, "Lesson 1");
@@ -13,7 +11,7 @@ int main()
         learnopengl->processInput();
 
         //×´Ì¬ÉèÖÃ
-        glClearColor(0.31f, 0.31f, 0.33f, 0.0f);
+        glClearColor(0.31f, 0.31f, 0.9f, 0.0f);
         glClearDepth(0);
         //×´Ì¬Ê¹ÓÃ
         glClear(GL_COLOR_BUFFER_BIT);

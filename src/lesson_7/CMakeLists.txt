@@ -6,6 +6,7 @@ INCLUDE_DIRECTORIES(
 	${THIRDPARTY_GLAD_DIR}/include
 	${THIRDPARTY_GLFW_DIR}/include
 	../Common
+	../Camera
 	${CONAN_INCLUDE_DIRS_STB_RELEASE}
 	${CONAN_INCLUDE_DIRS_GLM_RELEASE}
 )
@@ -20,6 +21,7 @@ FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
 	${THIRDPARTY_GLAD_DIR}/src/*.c
     *.h
 	../Common/*.h
+	../Camera/*.h
 	../Common/*.cpp
 	./shader/*.shader
     )

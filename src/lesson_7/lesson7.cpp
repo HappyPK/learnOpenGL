@@ -7,8 +7,6 @@
 #define SCR_WIDITH 1280
 #define SCR_HEIGHT 768
 
-using namespace LearnOpenGL;
-
 void SetVertex(std::vector<float>& vertices)
 {
     vertices = {
@@ -146,8 +144,8 @@ int main()
 
     auto window = learnopengl->GetGlfwWindows();
     
-    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_6\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_6\\shader\\fragment.shader";
+    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_7\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_7\\shader\\fragment.shader";
     std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(), FragmentPath.c_str());
     
 
@@ -214,9 +212,6 @@ int main()
 
         
         glm::mat4 view = glm::mat4(1.0f);
-        /*float radius = 20.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;*/
 
 
         view = glm::lookAt

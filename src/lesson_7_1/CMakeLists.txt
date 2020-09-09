@@ -1,6 +1,6 @@
-MESSAGE("------------------------Lesson_5.Transformations")
+MESSAGE("------------------------Lesson_7_1.Camera_use_mouse")
 
-set (Lesson_5 "Lesson_5")
+set (Lesson_7_1 "Lesson_7_1")
 
 INCLUDE_DIRECTORIES(
 	${THIRDPARTY_GLAD_DIR}/include
@@ -32,10 +32,10 @@ file(GLOB_RECURSE project_shaders *.shader)
 set(all_files ${project_headers} ${project_cpps} ${project_shaders})
 SOURCE_GROUP_BY_DIR(all_files)
 
-ADD_EXECUTABLE(Lesson_5 ${PROJECT_SOURCE_FILES})
+ADD_EXECUTABLE(Lesson_7_1 ${PROJECT_SOURCE_FILES})
 SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
-TARGET_LINK_LIBRARIES(Lesson_5 debug glfw3d optimized glfw3)
-TARGET_LINK_LIBRARIES(Lesson_5 debug opengl32 optimized opengl32)
+TARGET_LINK_LIBRARIES(Lesson_7_1 debug glfw3d optimized glfw3)
+TARGET_LINK_LIBRARIES(Lesson_7_1 debug opengl32 optimized opengl32)
 
 
 

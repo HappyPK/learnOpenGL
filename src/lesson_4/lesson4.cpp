@@ -5,8 +5,6 @@
 
 #define USE_MORE_ATTRIBUTE true
 
-using namespace LearnOpenGL;
-
 void SetVertex(std::vector<float>& vertices)
 {
     vertices =

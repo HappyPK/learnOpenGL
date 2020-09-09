@@ -7,6 +7,7 @@
 #define SCR_WIDITH 1280
 #define SCR_HEIGHT 768
 
+
 void SetVertex(std::vector<float>& vertices)
 {
     vertices = {
@@ -138,14 +139,76 @@ void createTexture(const std::string &image, uint32_t &texture)
     stbi_image_free(data);
 }
 
+
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+float fov = 45.0f;
+
+// camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= (float)yoffset;
+    if (fov < 1.0f)
+        fov = 1.0f;
+    if (fov > 45.0f)
+        fov = 45.0f;
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+
+
 int main()
 {
     std::unique_ptr<LearnOpenGLCommon> learnopengl = std::make_unique<LearnOpenGLCommon>(4, 6, SCR_WIDITH, SCR_HEIGHT, "Lesson 6");
 
     auto window = learnopengl->GetGlfwWindows();
     
-    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_6\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_6\\shader\\fragment.shader";
+    learnopengl->SetCursorPosCallback(mouse_callback);
+    learnopengl->SetscrollfunCallback(scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+
+    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_7_1\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_7_1\\shader\\fragment.shader";
     std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(), FragmentPath.c_str());
     
 
@@ -184,11 +247,19 @@ int main()
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDITH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    myShader->setMat4("projection", projection);
+
+    int timeIndex = 0;
+
     while (!glfwWindowShouldClose(window))
     {
-        learnopengl->processInput();
-
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        learnopengl->processInput(cameraPos, cameraFront, cameraUp);
+        
+        glClearColor((float)(timeIndex++) *0.001f, (float)(timeIndex++) * 0.002f, (float)(timeIndex++) * 0.0022f, 1.0f);
+        if (timeIndex > 1000)
+            timeIndex = 0;
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // bind Texture
@@ -201,34 +272,25 @@ int main()
 
         
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+
+
+        view = glm::lookAt
+        (
+            cameraPos,
+            cameraPos+ cameraFront,
+            cameraUp
+        );
         myShader->setMat4("view", view);
 
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDITH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        myShader->setMat4("projection", projection);
-
-        if (!USE_MORE_ATTRIBUTE)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1.0f, 0.5f, 0.0f));
-            myShader->setMat4("model", model); 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-
         glBindVertexArray(VAO);
-        if (USE_MORE_ATTRIBUTE)
+        for (unsigned int i = 0; i < 10; i++)
         {
-            for (unsigned int i = 0; i < 10; i++)
-            {
-                glm::mat4 model = glm::mat4(1.0f);;
-                model = glm::translate(model, cubePositions[i]);
-                float angle = 20.0f * (i+5);
-                model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                myShader->setMat4("model", model);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-            }
+            glm::mat4 model = glm::mat4(1.0f);;
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * (i+5);
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            myShader->setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
 
