@@ -39,9 +39,12 @@ else(UNIX)
     SET(CMAKE_CXX_STANDARD 17)
 endif(UNIX)
 
-set (BIN_DIR "${CMAKE_SOURCE_DIR}/bin/${PlatformName}" CACHE PATH "BIN DIR")
+set (BIN_DIR "${CMAKE_SOURCE_DIR}/bin/vc16/${PlatformName}")
 set (THIRDPARTY_GLAD_DIR "${CMAKE_SOURCE_DIR}/3rdParty/glad")
 set (THIRDPARTY_GLFW_DIR "${CMAKE_SOURCE_DIR}/3rdParty/GLFW")
+message("--------------------------------")
+message("${BIN_DIR}")
+message("--------------------------------")
 
 LINK_DIRECTORIES(${BIN_DIR})
 # ------------------------------------------------------------------------------
@@ -70,15 +73,7 @@ MACRO(SOURCE_GROUP_BY_DIR source_files)
     endif(MSVC)
 ENDMACRO(SOURCE_GROUP_BY_DIR)
 
-add_subdirectory(src/Lesson_1)
-add_subdirectory(src/Lesson_2)
-add_subdirectory(src/Lesson_3)
-add_subdirectory(src/Lesson_4)
-add_subdirectory(src/Lesson_5)
-add_subdirectory(src/Lesson_6)
-add_subdirectory(src/Lesson_7)
-add_subdirectory(src/Lesson_7_1)
-add_subdirectory(src/Lesson_7_2)
+add_subdirectory(src/Chapter_1)
 
 
 

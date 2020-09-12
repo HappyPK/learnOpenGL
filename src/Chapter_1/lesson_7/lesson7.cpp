@@ -109,7 +109,7 @@ void createTexture(const std::string &image, uint32_t &texture)
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
     
-    std::string path = "..\\..\\..\\..\\pic\\" + image;
+    std::string path = "..\\..\\..\\..\\..\\pic\\" + image;
     std::string pureName = image.substr(image.find_last_of(".") + 1);
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data)
@@ -144,8 +144,8 @@ int main()
 
     auto window = learnopengl->GetGlfwWindows();
     
-    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_7\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_7\\shader\\fragment.shader";
+    std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_7\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_7\\shader\\fragment.shader";
     std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(), FragmentPath.c_str());
     
 

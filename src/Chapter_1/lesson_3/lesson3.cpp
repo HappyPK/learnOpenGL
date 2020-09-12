@@ -85,8 +85,8 @@ int main()
 
     auto window = learnopengl->GetGlfwWindows();
 
-    std::string VertexPath = "..\\..\\..\\..\\src\\lesson_3\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\src\\lesson_3\\shader\\fragment.shader";
+    std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_3\\shader\\vertex.shader";
+    std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_3\\shader\\fragment.shader";
     std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(),FragmentPath.c_str());
 
     myShader->use();
