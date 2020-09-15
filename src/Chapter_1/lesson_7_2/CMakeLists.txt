@@ -1,4 +1,4 @@
-project(Lesson_7_2)
+project(Lesson_1_7_2)
 MESSAGE("------------------------Chapter_1.Lesson_7_2.Camera_class")
 
 FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
@@ -17,12 +17,12 @@ file(GLOB_RECURSE project_shaders *.shader)
 set(all_files ${project_headers} ${project_cpps} ${project_shaders})
 SOURCE_GROUP_BY_DIR(all_files)
 
-ADD_EXECUTABLE(Lesson_7_2 ${PROJECT_SOURCE_FILES})
+ADD_EXECUTABLE(Lesson_1_7_2 ${PROJECT_SOURCE_FILES})
 SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
-TARGET_LINK_LIBRARIES(Lesson_7_2 debug glfw3d optimized glfw3)
-TARGET_LINK_LIBRARIES(Lesson_7_2 debug opengl32 optimized opengl32)
+TARGET_LINK_LIBRARIES(Lesson_1_7_2 debug glfw3d optimized glfw3)
+TARGET_LINK_LIBRARIES(Lesson_1_7_2 debug opengl32 optimized opengl32)
 
-set_property(TARGET Lesson_7_2 PROPERTY FOLDER "Chapter_1")
+set_property(TARGET Lesson_1_7_2 PROPERTY FOLDER "Chapter_1")
 
 
 
