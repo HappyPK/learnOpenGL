@@ -4,10 +4,6 @@ MESSAGE("------------------------Chapter_1.Lesson_2.triangle")
 FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
 	${THIRDPARTY_GLAD_DIR}/src/*.c
-    *.h
-	../../Common/*.h
-	../../Common/*.cpp
-	../../Camera/*.h
     )
 
 ADD_EXECUTABLE(Lesson_1_2 ${PROJECT_SOURCE_FILES})

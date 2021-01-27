@@ -3,12 +3,9 @@ MESSAGE("------------------------Chapter_1.Lesson_4.Texture")
 
 FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
+	*.h
 	${THIRDPARTY_GLAD_DIR}/src/*.c
-    *.h
-	../../Common/*.h
-	../../Common/*.cpp
-	../../Camera/*.h
-	./shader/*.shader
+	./shader/*.*
     )
 	
 file(GLOB_RECURSE project_headers *.h)

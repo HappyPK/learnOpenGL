@@ -1,121 +1,87 @@
-#include "common.h"
-#include "Shader.h"
-#define USE_MORE_ATTRIBUTE true
+#include <iostream>
+#include "Shade.h"
+#include <GLFW/glfw3.h>
 
-void SetVertex(std::vector<float>& vertices)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    if (USE_MORE_ATTRIBUTE)
-    {
-        vertices =
-        {
-            // 位置              // 颜色
-            0.5f, -0.5f, 0.0f,  0.5f, 1.0f, 0.0f,   // 右下
-            -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 1.0f,   // 左下
-            0.0f,  0.5f, 0.0f,  1.0f, 0.0f, 0.5f    // 顶部
-        };
-    }
-    else
-    {
-        vertices =
-        {
-            0.5f, 0.5f, 0.0f,   // 右上角
-            0.5f, -0.5f, 0.0f,  // 右下角
-            -0.5f, -0.5f, 0.0f, // 左下角
-            -0.5f, 0.5f, 0.0f   // 左上角 
-        };
-    }
-
+    glViewport(0, 0, width, height);
 }
 
-void SetIndex(std::vector<unsigned int>& indices)
+void processInput(GLFWwindow* window)
 {
-    indices =
-    { // 注意索引从0开始! 
-        0, 1, 3, // 第一个三角形
-        1, 2, 3  // 第二个三角形
-    };
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
 
-unsigned int createVBO(const std::vector<float> vertices)
+float vertices[] =
 {
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, (vertices.size() * sizeof(float)), vertices.data(), GL_STATIC_DRAW);
-    
-    int cout = USE_MORE_ATTRIBUTE ? 6 : 3;
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, cout * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    // 位置              // 颜色
+     0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   // 右下
+    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 1.0f,   // 左下
+     0.0f,  0.5f, 0.0f,  1.0f, 0.0f, 1.0f    // 顶部
+};
 
-    if (USE_MORE_ATTRIBUTE)
-    {
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, cout * sizeof(float), (void*)(3*sizeof(float)));
-        glEnableVertexAttribArray(1);
-    }
-
-    return VBO;
-}
-
-unsigned int createVAO()
-{
-    unsigned int  VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    return VAO;
-}
-
-unsigned int createEBO(std::vector<unsigned int> indices)
-{
-    unsigned int  EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-    return EBO;
-}
-
-void SetGLMode(const GLenum& mode)
-{
-    glPolygonMode(GL_FRONT_AND_BACK, mode);
-}
+const std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_3\\shader\\vs.shader";
+const std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_3\\shader\\fs.shader";
 
 int main()
 {
-    std::unique_ptr<LearnOpenGLCommon> learnopengl = std::make_unique<LearnOpenGLCommon>(4, 6, 1280, 768, "Lesson 2");
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    auto window = learnopengl->GetGlfwWindows();
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
 
-    std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_3\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_3\\shader\\fragment.shader";
-    std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(),FragmentPath.c_str());
 
-    myShader->use();
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
 
-    std::vector<float> vertices;
-    SetVertex(vertices);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    std::vector<unsigned int> indices;
-    SetIndex(indices);
+    std::unique_ptr<Shader> myShader = std::make_unique<Shader>(VertexPath.c_str(), FragmentPath.c_str());
 
-    unsigned int VBO, VAO, EBO;
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
 
-    VAO = createVAO();
-    VBO = createVBO(vertices);
-    EBO = createEBO(indices);
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);//创建
 
-    SetGLMode(GL_FILL);
-    float offset = 0.5f;
-    myShader->setFloat("xOffset", offset);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//设置数据
 
+    // 位置属性
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // 颜色属性
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(window))
     {
-        learnopengl->processInput();
+        processInput(window);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.5f, 0.3f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindVertexArray(VAO);
+        myShader->use();
+        float offset = 0.0f;
+        myShader->setFloat("xOffset", offset);
 
+        glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
@@ -124,8 +90,8 @@ int main()
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    
 
+    glfwTerminate();
     return 0;
 }
-
