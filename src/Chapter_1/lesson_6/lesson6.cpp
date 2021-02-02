@@ -1,236 +1,134 @@
-#include "common.h"
-#include "Shader.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <iostream>
+#include "Shade.h"
+#include "image.h"
+#include <GLFW/glfw3.h>
 
-#define USE_MORE_ATTRIBUTE true
-#define SCR_WIDITH 1280
-#define SCR_HEIGHT 768
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-void SetVertex(std::vector<float>& vertices)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    vertices = {
-        // positions          // texture coords
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f, 0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, 0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, 0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f,  0.0f, 1.0f };
+    glViewport(0, 0, width, height);
 }
 
-void SetIndex(std::vector<unsigned int>& indices)
+void processInput(GLFWwindow* window)
 {
-    indices =
-    { // 注意索引从0开始! 
-        0, 1, 3, // 第一个三角形
-        1, 2, 3  // 第二个三角形
-    };
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
 
-void createVBO(const std::vector<float> vertices, uint32_t& VBO)
+float vertices[] =
 {
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, (vertices.size() * sizeof(float)), vertices.data(), GL_STATIC_DRAW);
-    
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    // ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+};
 
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-}
-
-void createVAO(uint32_t &VAO)
+unsigned int indices[] = 
 {
+    0, 1, 3, // first triangle
+    1, 2, 3  // second triangle
+};
+
+const std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_6\\shader\\vs.shader";
+const std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_6\\shader\\fs.shader";
+const std::string ImagePath = "..\\..\\..\\..\\..\\src\\image\\awesomeface.png";
+
+int main()
+{
+    Image image;
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    std::unique_ptr<Shader> myShader = std::make_unique<Shader>(VertexPath.c_str(), FragmentPath.c_str());
+    myShader->use();
+
+    unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-}
-
-void createEBO(std::vector<unsigned int> indices, uint32_t &EBO)
-{
+    glGenBuffers(1, &VBO);//创建
     glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);//绑定
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//设置数据
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-}
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-void SetGLMode(const GLenum& mode)
-{
-    glPolygonMode(GL_FRONT_AND_BACK, mode);
-}
+    // 位置属性
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // 颜色属性
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    //材质属性
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
-void createTexture(const std::string &image, uint32_t &texture)
-{
+    unsigned int texture;
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
+    stbi_set_flip_vertically_on_load(true);
     int width, height, nrChannels;
-    
-    std::string path = "..\\..\\..\\..\\..\\pic\\" + image;
-    std::string pureName = image.substr(image.find_last_of(".") + 1);
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char* data = image.LoadImage(ImagePath.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        if (pureName == "png")
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        }
-        else if (pureName == "jpg" || pureName == "jpeg")
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        }
-        else
-        {
-            std::cout << "Failed to load texture" << std::endl;
-            stbi_image_free(data);
-            return;
-        }
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
         std::cout << "Failed to load texture" << std::endl;
     }
-    stbi_image_free(data);
-}
+    image.DeleteImage(data);
 
-int main()
-{
-    std::unique_ptr<LearnOpenGLCommon> learnopengl = std::make_unique<LearnOpenGLCommon>(4, 6, SCR_WIDITH, SCR_HEIGHT, "Lesson 6");
 
-    auto window = learnopengl->GetGlfwWindows();
-    
-    std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_6\\shader\\vertex.shader";
-    std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_6\\shader\\fragment.shader";
-    std::unique_ptr<MyShader> myShader = std::make_unique<MyShader>(VertexPath.c_str(), FragmentPath.c_str());
-    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    stbi_set_flip_vertically_on_load(true);
 
-    std::vector<float> vertices;
-    SetVertex(vertices);
-
-    std::vector<unsigned int> indices;
-    SetIndex(indices);
-
-    unsigned int VBO, VAO, EBO, Texture1, Texture2;
-    createVAO(VAO);
-    createVBO(vertices, VBO);
-    createEBO(indices, EBO);
-
-    createTexture("container.jpg", Texture1);
-    createTexture("awesomeface.png", Texture2);
-
-    myShader->use();
-    myShader->setInt("texture1", 0);
-    myShader->setInt("texture2", 1);
-    glEnable(GL_DEPTH_TEST);
-
-    glm::vec3 cubePositions[] = 
-    {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
-
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(window))
     {
-        learnopengl->processInput();
+        processInput(window);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // bind Texture
-        glActiveTexture(GL_TEXTURE0); // 在绑定纹理之前先激活纹理单元
-        glBindTexture(GL_TEXTURE_2D, Texture1);
-        glActiveTexture(GL_TEXTURE1); // 在绑定纹理之前先激活纹理单元
-        glBindTexture(GL_TEXTURE_2D, Texture2);
-
-        myShader->use();
+        glClearColor(0.5f, 0.3f, 0.8f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
-        myShader->setMat4("view", view);
-
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDITH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        myShader->setMat4("projection", projection);
-
-        if (!USE_MORE_ATTRIBUTE)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(1.0f, 0.5f, 0.0f));
-            myShader->setMat4("model", model); 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         glBindVertexArray(VAO);
-        if (USE_MORE_ATTRIBUTE)
-        {
-            for (unsigned int i = 0; i < 10; i++)
-            {
-                glm::mat4 model = glm::mat4(1.0f);;
-                model = glm::translate(model, cubePositions[i]);
-                float angle = 20.0f * (i+5);
-                model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                myShader->setMat4("model", model);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
-            }
-        }
-
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -240,6 +138,6 @@ int main()
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 
+    glfwTerminate();
     return 0;
 }
-

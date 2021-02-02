@@ -5,10 +5,7 @@ FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
 	${THIRDPARTY_GLAD_DIR}/src/*.c
     *.h
-	../../Common/*.h
-	../../Common/*.cpp
-	../../Camera/*.h
-	./shader/*.shader
+	./shader/*.*
     )
 	
 file(GLOB_RECURSE project_headers *.h)
