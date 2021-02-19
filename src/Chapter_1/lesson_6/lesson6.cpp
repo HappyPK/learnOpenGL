@@ -20,11 +20,11 @@ void processInput(GLFWwindow* window)
 
 float vertices[] =
 {
-    // ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+    // ---- 位置 ----     - 纹理坐标 -
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // 右上
+     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // 右下
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   // 左下
+    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    // 左上
 };
 
 unsigned int indices[] = 
@@ -79,18 +79,14 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // 位置属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // 颜色属性
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
     //材质属性
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     unsigned int texture;
     glGenTextures(1, &texture);
-
     glBindTexture(GL_TEXTURE_2D, texture);
 
     // 为当前绑定的纹理对象设置环绕、过滤方式
@@ -112,11 +108,6 @@ int main()
     }
     image.DeleteImage(data);
 
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -124,10 +115,26 @@ int main()
         glClearColor(0.5f, 0.3f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        
         glBindTexture(GL_TEXTURE_2D, texture);
 
+        glm::mat4 trans(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        myShader->setMat4("transform", trans);
+
         glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // second transformation
+// ---------------------
+        trans = glm::mat4(1.0f); // reset it to identity matrix
+        trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+        float scaleAmount = sin(glfwGetTime());
+        trans = glm::scale(trans, glm::vec3(scaleAmount, 0.5*scaleAmount, 0.4*scaleAmount));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        myShader->setMat4("transform", trans);
+
+        // now with the uniform matrix being replaced with new transformations, draw it again.
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);

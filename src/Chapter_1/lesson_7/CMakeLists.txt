@@ -5,10 +5,7 @@ FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
 	${THIRDPARTY_GLAD_DIR}/src/*.c
     *.h
-	../../Common/*.h
-	../../Camera/*.h
-	../../Common/*.cpp
-	./shader/*.shader
+	./shader/*.*
     )
 	
 file(GLOB_RECURSE project_headers *.h)
@@ -23,6 +20,7 @@ TARGET_LINK_LIBRARIES(Lesson_1_7 debug glfw3d optimized glfw3)
 TARGET_LINK_LIBRARIES(Lesson_1_7 debug opengl32 optimized opengl32)
 
 set_property(TARGET Lesson_1_7 PROPERTY FOLDER "Chapter_1")
+
 
 
 
