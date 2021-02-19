@@ -22,24 +22,72 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 }
 
-float vertices[] =
-{
-    // ---- 位置 ----     - 纹理坐标 -
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // 右上
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // 右下
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   // 左下
-    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f    // 左上
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
+
+glm::vec3 cubePositions[] = {
+  glm::vec3(0.0f,  0.0f,  0.0f),
+  glm::vec3(2.0f,  5.0f, -15.0f),
+  glm::vec3(-1.5f, -2.2f, -2.5f),
+  glm::vec3(-3.8f, -2.0f, -12.3f),
+  glm::vec3(2.4f, -0.4f, -3.5f),
+  glm::vec3(-1.7f,  3.0f, -7.5f),
+  glm::vec3(1.3f, -2.0f, -2.5f),
+  glm::vec3(1.5f,  2.0f, -2.5f),
+  glm::vec3(1.5f,  0.2f, -1.5f),
+  glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
 unsigned int indices[] = 
 {
     0, 1, 3, // first triangle
-    1, 2, 3  // second triangle
+    1, 2, 3,  // second triangle
 };
 
-const std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_7\\shader\\vs.shader";
-const std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_7\\shader\\fs.shader";
-const std::string ImagePath = "..\\..\\..\\..\\..\\src\\image\\awesomeface.png";
+const std::string VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_9\\shader\\vs.shader";
+const std::string FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_1\\lesson_9\\shader\\fs.shader";
+const std::string ImagePath = "..\\..\\..\\..\\..\\src\\image\\y.jpg";
 
 int main()
 {
@@ -66,10 +114,10 @@ int main()
     }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    glEnable(GL_DEPTH_TEST);
     std::unique_ptr<Shader> myShader = std::make_unique<Shader>(VertexPath.c_str(), FragmentPath.c_str());
     myShader->use();
-
+    
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);//创建
@@ -103,7 +151,7 @@ int main()
     unsigned char* data = image.LoadImage(ImagePath.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -117,23 +165,30 @@ int main()
         processInput(window);
 
         glClearColor(0.5f, 0.3f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        glm::mat4 trans(1.0f);
-
-        glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        //glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 1.0f));
-        view = glm::translate(view, glm::vec3(0.2f, 0.5f, -3.0f));
+
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
-        myShader->setMat4("model", model);
         myShader->setMat4("view", view);
         myShader->setMat4("projection", projection);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(VAO);
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            model = glm::rotate(model, (float)glfwGetTime()*(100000*i+1), glm::vec3(-1.0f, -1.0f, 0.0f));
+            myShader->setMat4("model", model); 
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);        
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
