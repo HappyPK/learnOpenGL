@@ -1,8 +1,6 @@
 INCLUDE_DIRECTORIES(
 	${THIRDPARTY_GLAD_DIR}/include
 	${THIRDPARTY_GLFW_DIR}/include
-	../Common
-	../Camera
 	${CONAN_INCLUDE_DIRS_STB_RELEASE}
 	${CONAN_INCLUDE_DIRS_GLM_RELEASE}
 )
@@ -21,3 +19,4 @@ add_subdirectory(lesson_6)
 add_subdirectory(lesson_7)
 add_subdirectory(lesson_8)
 add_subdirectory(lesson_9)
+add_subdirectory(lesson_10)
