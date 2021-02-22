@@ -11,3 +11,4 @@ LINK_DIRECTORIES(
 )
 
 add_subdirectory(lesson_2_1)
+add_subdirectory(lesson_2_2)

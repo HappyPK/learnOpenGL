@@ -16,3 +16,4 @@ if %errorlevel% neq 0 exit
 cmake ../../ -G "Visual Studio 16 2019"
 
 cd ../../
+pause
