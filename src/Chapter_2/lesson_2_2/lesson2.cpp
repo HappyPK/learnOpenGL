@@ -13,7 +13,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(5.0f, -5.0f, 10.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -23,7 +23,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(2.0f, 0.0f, 0.0f);
+glm::vec3 lightPos(0.2f, 0.0f, 4.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -45,7 +45,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    //camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -116,7 +116,6 @@ const std::string color_VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson
 const std::string color_FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\color_fs.shader";
 const std::string light_VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\light_vs.shader";
 const std::string light_FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\light_fs.shader";
-//const std::string ImagePath = "..\\..\\..\\..\\..\\src\\image\\awesomeface.png";
 
 
 int main()
@@ -166,32 +165,7 @@ int main()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    //材质属性
-    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-
-    /*unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    stbi_set_flip_vertically_on_load(true);
-    int width, height, nrChannels;
-    unsigned char* data = image.LoadImage(ImagePath.c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    image.DeleteImage(data);*/
+    
 
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);
@@ -199,27 +173,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-    //glGenTextures(1, &texture);
-    //glBindTexture(GL_TEXTURE_2D, texture);
-    //// 为当前绑定的纹理对象设置环绕、过滤方式
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //stbi_set_flip_vertically_on_load(true);
-    //data = image.LoadImage(ImagePath.c_str(), &width, &height, &nrChannels, 0);
-    //if (data)
-    //{
-    //    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    //    glGenerateMipmap(GL_TEXTURE_2D);
-    //}
-    //else
-    //{
-    //    std::cout << "Failed to load texture" << std::endl;
-    //}
-    //image.DeleteImage(data);
+    
 
     while (!glfwWindowShouldClose(window))
     {
@@ -232,21 +186,21 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+        //lightPos.x = sin(glfwGetTime()) * 2.0f;
+        //lightPos.z = cos(glfwGetTime()) * 2.0f;
 
         mycolor_Shader->use();
-        //glBindTexture(GL_TEXTURE_2D, texture);
         mycolor_Shader->setVec3("lightPos", lightPos);
         mycolor_Shader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         mycolor_Shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        mycolor_Shader->setVec3("viewPos", camera.Position);
+
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         mycolor_Shader->setMat4("projection", projection);
         mycolor_Shader->setMat4("view", view);
         glBindVertexArray(VAO);
         glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
         mycolor_Shader->setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
