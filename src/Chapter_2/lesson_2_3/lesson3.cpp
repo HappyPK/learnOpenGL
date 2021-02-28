@@ -23,7 +23,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(0.3f, 0.2f, 1.5f);
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -112,10 +112,10 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
-const std::string color_VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\color_vs.shader";
-const std::string color_FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\color_fs.shader";
-const std::string light_VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\light_vs.shader";
-const std::string light_FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_2\\shader\\light_fs.shader";
+const std::string color_VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_3\\shader\\color_vs.shader";
+const std::string color_FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_3\\shader\\color_fs.shader";
+const std::string light_VertexPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_3\\shader\\light_vs.shader";
+const std::string light_FragmentPath = "..\\..\\..\\..\\..\\src\\Chapter_2\\lesson_2_3\\shader\\light_fs.shader";
 
 
 int main()
@@ -186,23 +186,37 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //lightPos.x = sin(glfwGetTime()) * 2.0f;
-        //lightPos.z = cos(glfwGetTime()) * 2.0f;
-
         mycolor_Shader->use();
-        mycolor_Shader->setVec3("lightPos", lightPos);
-        mycolor_Shader->setVec3("objectColor", 1.0f, 0.5f, 0.53f);
-        mycolor_Shader->setVec3("lightColor", 0.3f, 0.5f, 0.5f);
+        mycolor_Shader->setVec3("light.position", lightPos);
         mycolor_Shader->setVec3("viewPos", camera.Position);
 
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+        mycolor_Shader->setVec3("light.ambient", ambientColor);
+        mycolor_Shader->setVec3("light.diffuse", diffuseColor);
+        mycolor_Shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // material properties
+        mycolor_Shader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        mycolor_Shader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        mycolor_Shader->setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
+        mycolor_Shader->setFloat("material.shininess", 32.0f);
+       
+        // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         mycolor_Shader->setMat4("projection", projection);
         mycolor_Shader->setMat4("view", view);
-        glBindVertexArray(VAO);
+
+        // world transformation
         glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 0.0f));
         mycolor_Shader->setMat4("model", model);
+
+        glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
@@ -213,7 +227,6 @@ int main()
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 1.0f, 0.0f));
         mylight_Shader->setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
