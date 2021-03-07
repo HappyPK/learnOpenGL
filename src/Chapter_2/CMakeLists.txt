@@ -13,7 +13,8 @@ LINK_DIRECTORIES(
 add_subdirectory(lesson_2_1)
 add_subdirectory(lesson_2_2)
 add_subdirectory(lesson_2_3)
-
-
-
-
+add_subdirectory(lesson_2_4)
+add_subdirectory(lesson_2_5)
+add_subdirectory(lesson_2_6)
+add_subdirectory(lesson_2_7)
+add_subdirectory(lesson_2_8)

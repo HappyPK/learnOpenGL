@@ -42,6 +42,7 @@ endif(UNIX)
 set (BIN_DIR "${CMAKE_SOURCE_DIR}/bin/vc16/${PlatformName}")
 set (THIRDPARTY_GLAD_DIR "${CMAKE_SOURCE_DIR}/3rdParty/glad")
 set (THIRDPARTY_GLFW_DIR "${CMAKE_SOURCE_DIR}/3rdParty/GLFW")
+set (THIRDPARTY_ASSIMP_DIR "${CMAKE_SOURCE_DIR}/3rdParty/assimp5.0.1")
 message("--------------------------------")
 message("${BIN_DIR}")
 message("--------------------------------")
@@ -75,7 +76,7 @@ ENDMACRO(SOURCE_GROUP_BY_DIR)
 
 add_subdirectory(src/Chapter_1)
 add_subdirectory(src/Chapter_2)
-
+add_subdirectory(src/Chapter_3)
 
 
 

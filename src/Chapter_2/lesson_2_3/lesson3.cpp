@@ -23,7 +23,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(-0.3f, 0.2f, 1.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -41,7 +41,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos;
-    std::cout <<xpos <<" " <<ypos << std::endl;
+    //std::cout <<xpos <<" " <<ypos << std::endl;
     lastX = xpos;
     lastY = ypos;
 
@@ -187,15 +187,18 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         mycolor_Shader->use();
+        lightPos.x = sin(glfwGetTime() * sin(glfwGetTime())) * 0.3;
+        lightPos.y = -cos(glfwGetTime() * sin(glfwGetTime())) * 0.3;
         mycolor_Shader->setVec3("light.position", lightPos);
         mycolor_Shader->setVec3("viewPos", camera.Position);
 
         glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
-        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+        lightColor.x = 0.345; //sin(glfwGetTime() * 2.0f);
+        lightColor.y = 0.5; //cos(glfwGetTime() * 0.7f);
+        lightColor.z = 0.8; //sin(glfwGetTime() * 1.3f);
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.6f); // decrease the influence
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(1.0f); // low influence
+
         mycolor_Shader->setVec3("light.ambient", ambientColor);
         mycolor_Shader->setVec3("light.diffuse", diffuseColor);
         mycolor_Shader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
