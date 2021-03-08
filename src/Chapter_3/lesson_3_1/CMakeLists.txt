@@ -1,5 +1,5 @@
 project(Lesson_3_1)
-MESSAGE("------------------------Chapter_3.Lesson_3_1 Assimp")
+MESSAGE("------------------------Chapter_3.Lesson_3_1 Mesh")
 
 FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
@@ -7,8 +7,14 @@ FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.h
 	./shader/*.*
 	./camera/*.*
+	./model/*.*
     )
-	
+INCLUDE_DIRECTORIES(
+	.
+	./shader/
+	./camera/
+	./model/
+)
 file(GLOB_RECURSE project_headers *.h)
 file(GLOB_RECURSE project_cpps *.cpp)
 file(GLOB_RECURSE project_shaders *.shader)
