@@ -23,8 +23,9 @@ SOURCE_GROUP_BY_DIR(all_files)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SOURCE_FILES})
 SET(EXECUTABLE_OUTPUT_PATH ${BIN_DIR})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug glfw3d optimized glfw3 assimp-vc142-mtd)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug opengl32 optimized opengl32 assimp-vc142-mt)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug glfw3d           optimized glfw3)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug opengl32         optimized opengl32)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} debug assimp-vc142-mtd optimized assimp-vc142-mt)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "Chapter_3")
 

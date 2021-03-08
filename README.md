@@ -1,7 +1,7 @@
 # learnOpenGL
 
-Use VS-2019
+pip install conan
 
-Run gen-vs2019.bat to build project
+gen-vs2019.bat 
 
 
