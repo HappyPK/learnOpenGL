@@ -9,8 +9,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 960;
+const unsigned int SCR_HEIGHT = 540;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 8.0f));
