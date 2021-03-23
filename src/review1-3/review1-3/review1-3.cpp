@@ -16,10 +16,10 @@ const unsigned int SCR_HEIGHT = 540;
 
 namespace
 {
-	Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-	float lastX = SCR_WIDTH / 2.0f;
-	float lastY = SCR_HEIGHT / 2.0f;
-	bool firstMouse = true;
+	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>((glm::vec3(0.0f, 0.0f, 3.0f)));
+
+	bool GetCursorPos = false;
+	double last_xpos = 0.0, last_ypos = 0.0;
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
@@ -34,25 +34,39 @@ namespace
 
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
-		camera.ProcessMouseScroll(yoffset);
+		pCamera->ProcessMouseScroll(yoffset);
 	}
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	{
-		if (firstMouse)
+		if (GetCursorPos)
 		{
-			lastX = xpos;
-			lastY = ypos;
-			firstMouse = false;
+			last_xpos = xpos;
+			last_xpos = ypos;
 		}
+	}
 
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-		lastX = xpos;
-		lastY = ypos;
-
-		camera.ProcessMouseMovement(xoffset, yoffset);
+	void MouseButtonFun_CallBack(GLFWwindow* window, int button, int action, int mods)
+	{
+		switch (button)
+		{
+		case GLFW_MOUSE_BUTTON_LEFT:
+		{
+			if (action == GLFW_PRESS)
+				GetCursorPos = true;
+			else if (action == GLFW_RELEASE)
+				GetCursorPos = false;
+			break;
+		}
+		case GLFW_MOUSE_BUTTON_MIDDLE:
+			//todo
+			break;
+		case GLFW_MOUSE_BUTTON_RIGHT:
+			//todo
+			break;
+		default:
+			return;
+		}
 	}
 
 	bool genTexture(const std::string& imagePath, unsigned int& textureIndex)
@@ -108,23 +122,8 @@ float vertices[] = {
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-glm::vec3 cubePositions[] = {
-  glm::vec3(0.0f,  0.0f,  0.0f),
-  glm::vec3(2.0f,  5.0f, -15.0f),
-  glm::vec3(-1.5f, -2.2f, -2.5f),
-  glm::vec3(-3.8f, -2.0f, -12.3f),
-  glm::vec3(2.4f, -0.4f, -3.5f),
-  glm::vec3(-1.7f,  3.0f, -7.5f),
-  glm::vec3(1.3f, -2.0f, -2.5f),
-  glm::vec3(1.5f,  2.0f, -2.5f),
-  glm::vec3(1.5f,  0.2f, -1.5f),
-  glm::vec3(-1.3f,  1.0f, -1.5f)
-};
-
 const std::string texturePath1 = "..\\..\\..\\..\\..\\src\\image\\container.jpg";
 const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\awesomeface.png";
-
-
 
 int main()
 {
@@ -143,7 +142,9 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window,MouseButtonFun_CallBack);
 	glfwSetScrollCallback(window, scroll_callback);
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -173,8 +174,15 @@ int main()
 	genTexture(texturePath2, texture2);
 
 	pMyShader->use();
+
 	pMyShader->setInt("texture1", 0);
 	pMyShader->setInt("texture2", 1);
+
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture2);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -183,30 +191,17 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
+		pMyShader->setFloat("fmix", 0.5 * sin(glfwGetTime()) + 0.5);
 
-		
-		glm::mat4 view = camera.GetViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-
-		pMyShader->use();
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = pCamera->GetViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(pCamera->getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		pMyShader->setMat4("view", view);
 		pMyShader->setMat4("projection", projection);
-		pMyShader->setFloat("fmix",0.5*sin(glfwGetTime())+0.5);
-		glBindVertexArray(VAO);
+		pMyShader->setMat4("model", model);
 
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f)); 
-			pMyShader->setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
