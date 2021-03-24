@@ -15,6 +15,7 @@ class MdvConan(ConanFile):
         self.requires("boost/1.73.0")
         self.requires("stb/20200203")
         self.requires("glm/0.9.9.8")
+        self.requires("eigen/3.3.9")
 
     # 生成项目文件并编译
     def build(self):

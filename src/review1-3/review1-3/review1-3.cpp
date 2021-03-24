@@ -9,18 +9,27 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Eigen/Dense"  
+#include "Eigen/LU"  
+#include "Eigen/Core" 
+
+#include <math.h>
 
 // settings
 const unsigned int SCR_WIDTH  = 960;
 const unsigned int SCR_HEIGHT = 540;
 
+float Zoom         =  1.0;
+bool  firstMouse   =  true;
+float lastX        =  SCR_WIDTH / 2.0f;
+float lastY        =  SCR_HEIGHT / 2.0f;
+bool  BUTTON_LEFT =  false;
+bool  BUTTON_RIGHT = false;
+
 namespace
 {
-	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>((glm::vec3(0.0f, 0.0f, 3.0f)));
-
-	bool GetCursorPos = false;
-	double last_xpos = 0.0, last_ypos = 0.0;
-
+	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	{
 		glViewport(0, 0, width, height);
@@ -32,18 +41,64 @@ namespace
 			glfwSetWindowShouldClose(window, true);
 	}
 
+	void RotateX(float angle)
+	{
+		float d = pCamera->getDist();
+		int cnt = 100;
+		float theta = angle / cnt;
+		float slide_d = -2 * d * sin(theta * PI / 360);
+		pCamera->yaw(theta / 2);
+		for (; cnt != 0; --cnt)
+		{
+			pCamera->slide(slide_d, 0, 0);
+			pCamera->yaw(theta);
+		}
+		pCamera->yaw(-theta / 2);
+	}
+
+	void RotateY(float angle)
+	{
+		float d = pCamera->getDist();
+		int cnt = 100;
+		float theta = angle / cnt;
+		float slide_d = 2 * d * sin(theta * PI / 360);
+		pCamera->pitch(theta / 2);
+		for (; cnt != 0; --cnt)
+		{
+			pCamera->slide(0, slide_d, 0);
+			pCamera->pitch(theta);
+		}
+		pCamera->pitch(-theta / 2);
+	}
+
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
-		pCamera->ProcessMouseScroll(yoffset);
+		Zoom -= (float)yoffset * 0.05;
 	}
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	{
-		if (GetCursorPos)
+		if (firstMouse)
 		{
-			last_xpos = xpos;
-			last_xpos = ypos;
+			lastX = xpos;
+			lastY = ypos;
+			firstMouse = false;
 		}
+		float xoffset = (xpos - lastX) * 0.05;
+		float yoffset = (ypos - lastY) * 0.05;
+
+		if (BUTTON_LEFT)
+		{
+			RotateX(xoffset);
+			RotateY(yoffset);
+		}
+		else if (BUTTON_RIGHT)
+		{
+			pCamera->roll(xoffset);
+		}
+
+		lastX = xpos;
+		lastY = ypos;
 	}
 
 	void MouseButtonFun_CallBack(GLFWwindow* window, int button, int action, int mods)
@@ -53,17 +108,29 @@ namespace
 		case GLFW_MOUSE_BUTTON_LEFT:
 		{
 			if (action == GLFW_PRESS)
-				GetCursorPos = true;
+			{
+				BUTTON_LEFT = true;
+			}
 			else if (action == GLFW_RELEASE)
-				GetCursorPos = false;
+			{
+				firstMouse = true;
+				BUTTON_LEFT = false;
+			}
 			break;
 		}
-		case GLFW_MOUSE_BUTTON_MIDDLE:
-			//todo
-			break;
 		case GLFW_MOUSE_BUTTON_RIGHT:
-			//todo
+		{
+			if (action == GLFW_PRESS)
+			{
+				BUTTON_RIGHT = true;
+			}
+			else if (action == GLFW_RELEASE)
+			{
+				firstMouse = true;
+				BUTTON_RIGHT = false;
+			}
 			break;
+		}
 		default:
 			return;
 		}
@@ -127,6 +194,23 @@ const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\awesomeface.pn
 
 int main()
 {
+	if (true)
+	{
+		Eigen::Matrix3d rotMatrix;
+
+		Eigen::Vector3d vectorBefore(0, 0, 3);
+		Eigen::Vector3d vectorAfter(0, 3, 0);
+		rotMatrix = Eigen::Quaterniond::FromTwoVectors(vectorBefore, vectorAfter).toRotationMatrix();
+		std::cout << rotMatrix << std::endl;
+
+		Eigen::Vector3d testvectorBefore(0, 1, 3);
+		Eigen::Vector3d testvectorafter =rotMatrix * testvectorBefore;
+
+		std::cout << testvectorafter << std::endl;
+
+		return 0;
+	}
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -139,6 +223,7 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -150,6 +235,7 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+
 	glEnable(GL_DEPTH_TEST);
 	ShaderPtr pMyShader = std::make_shared<Shader>(vertexShaderSource, fragmentShaderSource);
 
@@ -178,7 +264,6 @@ int main()
 	pMyShader->setInt("texture1", 0);
 	pMyShader->setInt("texture2", 1);
 
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture1);
 	glActiveTexture(GL_TEXTURE1);
@@ -194,8 +279,8 @@ int main()
 		pMyShader->setFloat("fmix", 0.5 * sin(glfwGetTime()) + 0.5);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = pCamera->GetViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(pCamera->getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = pCamera->getModelViewMatrix();
+		glm::mat4 projection = pCamera->getPerspectMat(Zoom, (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1, 100.0);
 		pMyShader->setMat4("view", view);
 		pMyShader->setMat4("projection", projection);
 		pMyShader->setMat4("model", model);

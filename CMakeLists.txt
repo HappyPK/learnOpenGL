@@ -48,6 +48,11 @@ message("${BIN_DIR}")
 message("--------------------------------")
 
 LINK_DIRECTORIES(${BIN_DIR})
+message(${CONAN_INCLUDE_DIRS_EIGEN_RELEASE})
+INCLUDE_DIRECTORIES(
+	${CONAN_INCLUDE_DIRS_EIGEN_RELEASE}
+)
+
 # ------------------------------------------------------------------------------
 # OpenMP - used in voxel algorithm
 # ------------------------------------------------------------------------------
