@@ -41,64 +41,31 @@ namespace
 			glfwSetWindowShouldClose(window, true);
 	}
 
-	void RotateX(float angle)
-	{
-		float d = pCamera->getDist();
-		int cnt = 100;
-		float theta = angle / cnt;
-		float slide_d = -2 * d * sin(theta * PI / 360);
-		pCamera->yaw(theta / 2);
-		for (; cnt != 0; --cnt)
-		{
-			pCamera->slide(slide_d, 0, 0);
-			pCamera->yaw(theta);
-		}
-		pCamera->yaw(-theta / 2);
-	}
-
-	void RotateY(float angle)
-	{
-		float d = pCamera->getDist();
-		int cnt = 100;
-		float theta = angle / cnt;
-		float slide_d = 2 * d * sin(theta * PI / 360);
-		pCamera->pitch(theta / 2);
-		for (; cnt != 0; --cnt)
-		{
-			pCamera->slide(0, slide_d, 0);
-			pCamera->pitch(theta);
-		}
-		pCamera->pitch(-theta / 2);
-	}
-
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		Zoom -= (float)yoffset * 0.05;
 	}
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-	{
-		if (firstMouse)
-		{
-			lastX = xpos;
-			lastY = ypos;
-			firstMouse = false;
-		}
-		float xoffset = (xpos - lastX) * 0.05;
-		float yoffset = (ypos - lastY) * 0.05;
-
+	{		
 		if (BUTTON_LEFT)
 		{
-			RotateX(xoffset);
-			RotateY(yoffset);
-		}
-		else if (BUTTON_RIGHT)
-		{
-			pCamera->roll(xoffset);
-		}
+			if (firstMouse)
+			{
+				lastX = xpos;
+				lastY = ypos;
+				firstMouse = false;
+				return;
+			}
+			float xoffset = lastX - xpos;
+			pCamera->rotateY(xoffset);
 
-		lastX = xpos;
-		lastY = ypos;
+			float yoffset =  lastY - ypos;
+			pCamera->rotateX(yoffset);
+
+			lastX = xpos;
+			lastY = ypos;
+		}
 	}
 
 	void MouseButtonFun_CallBack(GLFWwindow* window, int button, int action, int mods)
@@ -126,7 +93,6 @@ namespace
 			}
 			else if (action == GLFW_RELEASE)
 			{
-				firstMouse = true;
 				BUTTON_RIGHT = false;
 			}
 			break;
@@ -194,7 +160,7 @@ const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\awesomeface.pn
 
 int main()
 {
-	if (true)
+	/*if (true)
 	{
 		Eigen::Matrix3d rotMatrix;
 
@@ -209,7 +175,7 @@ int main()
 		std::cout << testvectorafter << std::endl;
 
 		return 0;
-	}
+	}*/
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -281,6 +247,7 @@ int main()
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = pCamera->getModelViewMatrix();
 		glm::mat4 projection = pCamera->getPerspectMat(Zoom, (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1, 100.0);
+
 		pMyShader->setMat4("view", view);
 		pMyShader->setMat4("projection", projection);
 		pMyShader->setMat4("model", model);
