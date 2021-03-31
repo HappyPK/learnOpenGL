@@ -58,10 +58,28 @@ namespace
 				return;
 			}
 			float xoffset = lastX - xpos;
-			pCamera->rotateY(xoffset);
-
 			float yoffset =  lastY - ypos;
+
+			pCamera->rotateY(xoffset);
 			pCamera->rotateX(yoffset);
+
+			lastX = xpos;
+			lastY = ypos;
+		}
+		else if (BUTTON_RIGHT)
+		{
+			if (firstMouse)
+			{
+				lastX = xpos;
+				lastY = ypos;
+				firstMouse = false;
+				return;
+			}
+			float xoffset = lastX - xpos;
+			float yoffset = lastY - ypos;
+
+			pCamera->translateX(xoffset);
+			pCamera->translateY(yoffset);
 
 			lastX = xpos;
 			lastY = ypos;
@@ -93,6 +111,7 @@ namespace
 			}
 			else if (action == GLFW_RELEASE)
 			{
+				firstMouse = true;
 				BUTTON_RIGHT = false;
 			}
 			break;
