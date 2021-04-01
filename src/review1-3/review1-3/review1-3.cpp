@@ -179,23 +179,6 @@ const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\awesomeface.pn
 
 int main()
 {
-	/*if (true)
-	{
-		Eigen::Matrix3d rotMatrix;
-
-		Eigen::Vector3d vectorBefore(0, 0, 3);
-		Eigen::Vector3d vectorAfter(0, 3, 0);
-		rotMatrix = Eigen::Quaterniond::FromTwoVectors(vectorBefore, vectorAfter).toRotationMatrix();
-		std::cout << rotMatrix << std::endl;
-
-		Eigen::Vector3d testvectorBefore(0, 1, 3);
-		Eigen::Vector3d testvectorafter =rotMatrix * testvectorBefore;
-
-		std::cout << testvectorafter << std::endl;
-
-		return 0;
-	}*/
-
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -280,7 +263,6 @@ int main()
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
-
 
 	glfwTerminate();
 	return 0;
