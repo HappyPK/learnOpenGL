@@ -45,8 +45,8 @@ private:
 Camera::Camera(const Vector3d& pos, const Vector3d& target, const Vector3d& up):
     m_pos(pos),m_target(target),m_up(up)
 {
-    m_rotatefactor = 0.5;
-    m_translateFactor = 0.005;
+    m_rotatefactor = 0.6;
+    m_translateFactor = 0.006;
 }
 
 
@@ -66,10 +66,13 @@ void Camera::rotateY(const float& xoffset)
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::rotate(trans, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 
-    auto up = trans * Vector4d(m_up, 1.0f);
+    auto up = trans * Vector4d(m_up, 0.0f);
+    auto pos = trans * Vector4d(m_pos, 0.0f);
+    auto target = trans * Vector4d(m_target, 0.0f);
+
     m_up = Vector3d(up.x, up.y, up.z);
-    auto pos = trans * Vector4d(m_pos, 1.0f);
     m_pos = Vector3d(pos.x, pos.y, pos.z);
+    m_target = Vector3d(target.x, target.y, target.z);
 }
 
 void Camera::rotateX(const float& yoffset)
@@ -77,11 +80,14 @@ void Camera::rotateX(const float& yoffset)
     float angle = yoffset * m_rotatefactor;
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::rotate(trans, glm::radians(angle), Right());
+ 
+    auto up = trans * Vector4d(m_up, 0.0f);
+    auto pos = trans * Vector4d(m_pos, 0.0f);
+    auto target = trans * Vector4d(m_target, 0.0f);
 
-    auto up = trans * Vector4d(m_up, 1.0f);
     m_up = Vector3d(up.x, up.y, up.z);
-    auto pos = trans * Vector4d(m_pos, 1.0f);
     m_pos = Vector3d(pos.x, pos.y, pos.z);
+    m_target = Vector3d(target.x, target.y, target.z);
 }
 
 void Camera::translateX(const float& xoffset)
@@ -89,10 +95,11 @@ void Camera::translateX(const float& xoffset)
     float dir = xoffset * m_translateFactor;
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, Right()* dir);
-    auto pos = trans * Vector4d(m_pos, 1.0f);
-    m_pos = Vector3d(pos.x, pos.y, pos.z);
 
+    auto pos = trans * Vector4d(m_pos, 1.0f);
     auto target = trans * Vector4d(m_target, 1.0f);
+
+    m_pos = Vector3d(pos.x, pos.y, pos.z);
     m_target = Vector3d(target.x, target.y, target.z);
 }
 
@@ -103,7 +110,8 @@ void Camera::translateY(const float& yoffset)
     trans = glm::translate(trans, m_up * dir);
 
     auto pos = trans * Vector4d(m_pos, 1.0f);
-    m_pos = Vector3d(pos.x, pos.y, pos.z);
     auto target = trans * Vector4d(m_target, 1.0f);
+
+    m_pos = Vector3d(pos.x, pos.y, pos.z);
     m_target = Vector3d(target.x, target.y, target.z);
 }
