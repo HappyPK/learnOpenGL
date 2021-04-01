@@ -14,4 +14,6 @@ LINK_DIRECTORIES(
 	${THIRDPARTY_ASSIMP_DIR}/lib/Release
 )
 
-add_subdirectory(review1-3)
+add_subdirectory(review1)
+add_subdirectory(review2)
+

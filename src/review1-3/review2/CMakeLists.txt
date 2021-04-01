@@ -1,5 +1,5 @@
-project(review1-3)
-MESSAGE("------------------------review1-3.review1-3 review")
+project(review2)
+MESSAGE("------------------------review1-3.review2 review")
 
 FILE(GLOB PROJECT_SOURCE_FILES ${PROJECT_SOURCE_FILES}
     *.cpp
