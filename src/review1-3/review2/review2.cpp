@@ -26,15 +26,9 @@ float lastY        =  SCR_HEIGHT / 2.0f;
 bool  BUTTON_LEFT =  false;
 bool  BUTTON_RIGHT = false;
 
-// lighting
-glm::vec3 lightPos(0.7f, 0.7f, 0.7f);
-
-glm::vec3 m_objectColor(1.0f, 0.5f, 0.31f);
-glm::vec3 m_lightColor(1.0f, 1.0f, 1.0f);
-
 namespace
 {
-	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	std::shared_ptr<Camera> pEye = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -50,7 +44,7 @@ namespace
 
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
-		Zoom -= (float)yoffset * 0.05;
+		pEye->Scroll(yoffset);
 	}
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -67,8 +61,8 @@ namespace
 			float xoffset = xpos - lastX ;
 			float yoffset = ypos - lastY ;
 
-			pCamera->rotateY(xoffset, 0.05);
-			pCamera->rotateX(yoffset, 0.05);
+			pCamera->rotateY(xoffset, 0.1);
+			pCamera->rotateX(yoffset, 0.1);
 
 			lastX = xpos;
 			lastY = ypos;
@@ -137,52 +131,66 @@ namespace
 	}
 }
 
-float vertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+// positions all containers
+float d = 3.0f;
+glm::vec3 cubePositions[] = 
+{
+	glm::vec3( 1.0f,  1.0f, 1.0f)* d,
+	glm::vec3(-1.0f,  1.0f, 1.0f)* d,
+	glm::vec3(-1.0f, -1.0f, 1.0f)* d,
+	glm::vec3( 1.0f, -1.0f, 1.0f)* d,
+	glm::vec3( 1.0f,  1.0f, -1.0f)* d,
+	glm::vec3(-1.0f,  1.0f, -1.0f)* d,
+	glm::vec3(-1.0f, -1.0f, -1.0f)* d,
+	glm::vec3( 1.0f, -1.0f, -1.0f)* d
 };
-const std::string texturePath1 = "..\\..\\..\\..\\..\\src\\image\\container.jpg";
-const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\awesomeface.png";
 
+float vertices[] = {
+	// positions          // normals           // texture coords
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
+};
+const std::string texturePath1 = "..\\..\\..\\..\\..\\src\\image\\container2.png";
+const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\container2_specular.png";
 int main()
 {
 	glfwInit();
@@ -222,10 +230,12 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glBindVertexArray(VAO);
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 
 	unsigned int lightCubeVAO;
@@ -234,8 +244,17 @@ int main()
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+
+	unsigned int textureID1, textureID2;
+	genTexture(texturePath1, textureID1);
+	genTexture(texturePath2, textureID2);
+
+	pMyShader->use();
+	pMyShader->setInt("material.diffuse", 0);
+	pMyShader->setInt("material.specular", 1);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -246,25 +265,47 @@ int main()
 
 		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = pEye->getModelViewMatrix();
+		std::cout << Zoom << std::endl;
 		glm::mat4 projection = pEye->getPerspectMat(Zoom, (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 10000.0f);
+		glm::vec3 lightPos = pCamera->getCameraPos();
 
 		pMyShader->use();
-		pMyShader->setVec3("objectColor", m_objectColor);
-		pMyShader->setVec3("lightColor", m_lightColor);
-		pMyShader->setVec3("lightPos", lightPos);
+		pMyShader->setVec3("viewPos", pEye->getCameraPos());
+		
+		float shininess = 64.0;
+		pMyShader->setFloat("material.shininess", shininess);
+		
+		pMyShader->setVec3("light.direction", -lightPos);
+		pMyShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		pMyShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		pMyShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 		pMyShader->setMat4("view", view);
 		pMyShader->setMat4("projection", projection);
-		pMyShader->setMat4("model", model);
+
+		// bind diffuse map
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureID1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textureID2);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (unsigned int i = 0; i < 8; i++)
+		{
+			// calculate the model matrix for each object and pass it to shader before drawing
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 0.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			pMyShader->setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		pMyLightShader->use();
 		model = glm::mat4(1.0f);
-		lightPos = pCamera->getCameraPos();
 		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
+		model = glm::scale(model, glm::vec3(0.00001f));
 
 		pMyLightShader->setMat4("view", view);
 		pMyLightShader->setMat4("projection", projection);

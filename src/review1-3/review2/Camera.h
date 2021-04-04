@@ -25,6 +25,9 @@ public:
     void translateY(const float& yoffset, float translateFactor);
     
     const Vector3d getCameraPos() { return m_pos; }
+
+    void Scroll(const double& yoffset);
+
 private:
     Vector3d m_pos;
     Vector3d m_target;
@@ -45,6 +48,16 @@ Camera::Camera(const Vector3d& pos, const Vector3d& target, const Vector3d& up):
 
 }
 
+void Camera::Scroll(const double &yoffset)
+{
+    float dir = -yoffset * 0.05;
+    glm::mat4 trans = glm::mat4(1.0f);
+    auto Vdir = m_pos - m_target;
+    trans = glm::translate(trans, Vdir * dir);
+
+    auto pos = trans * Vector4d(m_pos, 1.0f);
+    m_pos = Vector3d(pos.x, pos.y, pos.z);
+}
 
 Mat4d Camera::getModelViewMatrix()
 {
