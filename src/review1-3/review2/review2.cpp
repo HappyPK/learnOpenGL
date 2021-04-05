@@ -28,7 +28,7 @@ bool  BUTTON_RIGHT = false;
 
 namespace
 {
-	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	std::shared_ptr<Camera> pCamera = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 6.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	std::shared_ptr<Camera> pEye = std::make_shared<Camera>(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -135,14 +135,14 @@ namespace
 float d = 3.0f;
 glm::vec3 cubePositions[] = 
 {
-	glm::vec3( 1.0f,  1.0f, 1.0f)* d,
-	glm::vec3(-1.0f,  1.0f, 1.0f)* d,
-	glm::vec3(-1.0f, -1.0f, 1.0f)* d,
-	glm::vec3( 1.0f, -1.0f, 1.0f)* d,
-	glm::vec3( 1.0f,  1.0f, -1.0f)* d,
-	glm::vec3(-1.0f,  1.0f, -1.0f)* d,
-	glm::vec3(-1.0f, -1.0f, -1.0f)* d,
-	glm::vec3( 1.0f, -1.0f, -1.0f)* d
+	glm::vec3( 0.7f,  0.7f, 0.7f)* d,
+	glm::vec3(-0.7f,  0.7f, 0.7f)* d,
+	glm::vec3(-0.7f, -0.7f, 0.7f)* d,
+	glm::vec3( 0.7f, -0.7f, 0.7f)* d,
+	glm::vec3( 0.7f,  0.7f, -0.7f)* d,
+	glm::vec3(-0.7f,  0.7f, -0.7f)* d,
+	glm::vec3(-0.7f, -0.7f, -0.7f)* d,
+	glm::vec3( 0.7f, -0.7f, -0.7f)* d
 };
 
 float vertices[] = {
@@ -191,6 +191,7 @@ float vertices[] = {
 };
 const std::string texturePath1 = "..\\..\\..\\..\\..\\src\\image\\container2.png";
 const std::string texturePath2 = "..\\..\\..\\..\\..\\src\\image\\container2_specular.png";
+
 int main()
 {
 	glfwInit();
@@ -275,10 +276,13 @@ int main()
 		float shininess = 64.0;
 		pMyShader->setFloat("material.shininess", shininess);
 		
-		pMyShader->setVec3("light.direction", -lightPos);
+		pMyShader->setVec3("light.position", lightPos);
 		pMyShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		pMyShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		pMyShader->setVec3("light.diffuse", 0.9f, 0.9f, 0.9f);
 		pMyShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		pMyShader->setFloat("light.constant", 1.0f);
+		pMyShader->setFloat("light.linear", 0.09f);
+		pMyShader->setFloat("light.quadratic", 0.032f);
 
 		pMyShader->setMat4("view", view);
 		pMyShader->setMat4("projection", projection);
@@ -305,7 +309,7 @@ int main()
 		pMyLightShader->use();
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.00001f));
+		model = glm::scale(model, glm::vec3(0.5f));
 
 		pMyLightShader->setMat4("view", view);
 		pMyLightShader->setMat4("projection", projection);

@@ -16,4 +16,5 @@ LINK_DIRECTORIES(
 
 add_subdirectory(review1)
 add_subdirectory(review2)
+add_subdirectory(review3)
 
